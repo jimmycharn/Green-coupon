@@ -171,7 +171,7 @@ export default function StaffDashboard() {
                 <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-1">
                         <Wallet className="w-5 h-5 text-purple-200" />
-                        <p className="text-purple-100 text-sm">เงินสดในมือ (Cash on Hand)</p>
+                        <p className="text-purple-100 text-sm">เงินสดที่จุดขาย</p>
                     </div>
                     <h2 className="text-4xl font-bold">
                         ฿{Number(staffBalance || 0).toLocaleString()}

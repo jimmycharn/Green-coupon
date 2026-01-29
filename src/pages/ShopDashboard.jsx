@@ -147,7 +147,7 @@ export default function ShopDashboard() {
                         <div className="bg-white bg-opacity-20 p-2 rounded-lg">
                             <DollarSign className="w-6 h-6" />
                         </div>
-                        <h3 className="font-medium opacity-90">ยอดรายได้</h3>
+                        <h3 className="font-medium opacity-90">รอจ่ายร้านค้า</h3>
                     </div>
                     <p className="text-4xl font-bold">฿{Number(profile?.balance || 0).toLocaleString()}</p>
                     <p className="text-sm opacity-75 mt-2">รอถอนเงิน</p>
