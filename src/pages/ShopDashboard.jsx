@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
+import RealtimeStatus from '../components/RealtimeStatus';
 import { History, DollarSign, Bell, X, RefreshCw } from 'lucide-react';
 
 export default function ShopDashboard() {
@@ -9,6 +10,7 @@ export default function ShopDashboard() {
     const [loading, setLoading] = useState(true);
     const [showQRModal, setShowQRModal] = useState(false);
     const [notification, setNotification] = useState(null);
+    const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
     const previousBalanceRef = useRef(null);
     const previousTxCountRef = useRef(0);
 
@@ -89,6 +91,7 @@ export default function ShopDashboard() {
                         (payload) => {
                             console.log('Profile update received:', payload);
                             setProfile(payload.new);
+                            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                         }
                     )
                     .on(
@@ -102,10 +105,12 @@ export default function ShopDashboard() {
                         (payload) => {
                             console.log('New transaction received:', payload);
                             fetchTransactions(userId, true);
+                            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                         }
                     )
                     .subscribe((status) => {
                         console.log('Realtime subscription status:', status);
+                        setRealtimeStatus(status);
                     });
             }
         };
@@ -140,6 +145,7 @@ export default function ShopDashboard() {
 
     return (
         <div className="space-y-6">
+            <RealtimeStatus status={realtimeStatus} />
             {/* Payment Notification */}
             {notification && (
                 <div className="fixed top-4 left-4 right-4 z-50 bg-green-500 text-white p-4 rounded-xl shadow-2xl animate-bounce">

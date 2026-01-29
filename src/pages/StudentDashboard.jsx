@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
-import { Scan, History, X, CreditCard, User, Bell, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Scan, History, X, CreditCard, User, Bell, RefreshCw } from 'lucide-react';
 import QRScanner from '../components/QRScanner';
+import RealtimeStatus from '../components/RealtimeStatus';
 
 export default function StudentDashboard() {
     const [profile, setProfile] = useState(null);
@@ -11,7 +12,7 @@ export default function StudentDashboard() {
     const [showQRModal, setShowQRModal] = useState(false);
     const [transactions, setTransactions] = useState([]);
     const [notification, setNotification] = useState(null);
-    const [isLive, setIsLive] = useState(false);
+    const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
     const previousBalanceRef = useRef(null);
     const userIdRef = useRef(null);
 
@@ -59,16 +60,21 @@ export default function StudentDashboard() {
 
     useEffect(() => {
         let channel = null;
+        let mounted = true;
 
         const init = async () => {
             const userId = await fetchProfile();
-            if (userId) {
+            if (mounted && userId) {
                 await fetchTransactions(userId);
                 setLoading(false);
 
                 // Subscribe to Realtime
+                // Use a unique channel name to avoid conflicts
+                const channelName = `student_dashboard_${userId}_${Date.now()}`;
+                console.log('Subscribing to channel:', channelName);
+
                 channel = supabase
-                    .channel(`student-${userId}`)
+                    .channel(channelName)
                     .on(
                         'postgres_changes',
                         {
@@ -97,7 +103,9 @@ export default function StudentDashboard() {
                     )
                     .subscribe((status) => {
                         console.log('Realtime status:', status);
-                        setIsLive(status === 'SUBSCRIBED');
+                        if (mounted) {
+                            setRealtimeStatus(status);
+                        }
                     });
             }
         };
@@ -105,7 +113,9 @@ export default function StudentDashboard() {
         init();
 
         return () => {
+            mounted = false;
             if (channel) {
+                console.log('Unsubscribing from channel');
                 supabase.removeChannel(channel);
             }
         };
@@ -161,6 +171,7 @@ export default function StudentDashboard() {
 
     return (
         <div className="space-y-6">
+            <RealtimeStatus status={realtimeStatus} />
             {/* Notification Toast */}
             {notification && (
                 <div className={`fixed top-4 left-4 right-4 z-50 p-4 rounded-xl shadow-lg flex items-center gap-3 animate-pulse ${notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
@@ -175,13 +186,8 @@ export default function StudentDashboard() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-10 -mb-10"></div>
 
-                {/* Status & Refresh */}
-                <div className="absolute top-4 right-4 flex items-center gap-2">
-                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${isLive ? 'bg-white bg-opacity-20' : 'bg-orange-500 bg-opacity-50'
-                        }`}>
-                        {isLive ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-                        <span>{isLive ? 'Live' : 'Offline'}</span>
-                    </div>
+                {/* Refresh Button */}
+                <div className="absolute top-4 right-4">
                     <button
                         onClick={handleRefresh}
                         className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"

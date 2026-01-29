@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { createClient } from '@supabase/supabase-js';
+import RealtimeStatus from '../components/RealtimeStatus';
 import { Users, Store, DollarSign, History, UserCheck, AlertCircle, Edit, Save, X, Plus, Wallet, Coins } from 'lucide-react';
 
 // Create a separate client for creating users to avoid signing out the admin
@@ -31,6 +32,7 @@ export default function AdminDashboard() {
     const [editingUser, setEditingUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
 
     // Create User Form State
     const [newUser, setNewUser] = useState({
@@ -59,10 +61,12 @@ export default function AdminDashboard() {
                 (payload) => {
                     console.log('Admin dashboard update received:', payload);
                     fetchData();
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
                 }
             )
             .subscribe((status) => {
                 console.log('Admin Realtime status:', status);
+                setRealtimeStatus(status);
             });
 
         return () => {
@@ -232,6 +236,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="space-y-8">
+            <RealtimeStatus status={realtimeStatus} />
             <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดผู้ดูแลระบบ</h1>
 
             {/* Admin Balance Card */}

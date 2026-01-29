@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import QRScanner from '../components/QRScanner';
+import RealtimeStatus from '../components/RealtimeStatus';
 import { PlusCircle, MinusCircle, UserCheck, CheckCircle, History, CreditCard, Search, Users, Wallet } from 'lucide-react';
 
 export default function StaffDashboard() {
@@ -16,6 +17,7 @@ export default function StaffDashboard() {
     const [students, setStudents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [staffBalance, setStaffBalance] = useState(0); // Cash on Hand
+    const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
 
     // Fetch staff profile (for Cash on Hand)
     const fetchStaffProfile = useCallback(async () => {
@@ -59,24 +61,6 @@ export default function StaffDashboard() {
         fetchStaffProfile();
         fetchRecentTransactions();
 
-        // Realtime subscription for balance updates
-        const subscription = supabase
-            .channel('staff_balance_updates')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'profiles',
-                    filter: `id=eq.${supabase.auth.getUser().then(({ data }) => data.user?.id)}` // This won't work directly in filter string usually, need to set up after auth
-                },
-                (payload) => {
-                    console.log('Balance update received:', payload);
-                    setStaffBalance(payload.new.balance);
-                }
-            )
-            .subscribe();
-
         // Better approach: Set up subscription after getting user ID
         const setupRealtime = async () => {
             const { data: { user } } = await supabase.auth.getUser();
@@ -95,9 +79,13 @@ export default function StaffDashboard() {
                     (payload) => {
                         console.log('Realtime update:', payload);
                         setStaffBalance(payload.new.balance);
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                     }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('Staff Realtime status:', status);
+                    setRealtimeStatus(status);
+                });
 
             return () => {
                 supabase.removeChannel(channel);
@@ -211,6 +199,7 @@ export default function StaffDashboard() {
 
     return (
         <div className="max-w-md mx-auto space-y-6">
+            <RealtimeStatus status={realtimeStatus} />
             <div className="text-center">
                 <h1 className="text-2xl font-bold text-gray-800">จุดขายคูปอง</h1>
                 <p className="text-gray-500">เลือกการดำเนินการ</p>
