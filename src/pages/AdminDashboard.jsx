@@ -176,29 +176,56 @@ export default function AdminDashboard() {
 
             if (user.role === 'staff') {
                 // Staff: Collect cash and add to Admin balance
+                // Get current staff balance first to ensure we have the correct amount
+                const { data: staffProfile, error: fetchStaffError } = await supabase
+                    .from('profiles')
+                    .select('balance')
+                    .eq('id', user.id)
+                    .single();
+
+                if (fetchStaffError) throw fetchStaffError;
+
+                const staffAmount = staffProfile?.balance || 0;
+                if (staffAmount <= 0) {
+                    alert('ไม่มียอดเงินที่ Staff');
+                    return;
+                }
+
                 // 1. Reset Staff balance to 0
-                const { error: staffError } = await supabase
+                const { data: updatedStaff, error: staffError } = await supabase
                     .from('profiles')
                     .update({ balance: 0 })
-                    .eq('id', user.id);
+                    .eq('id', user.id)
+                    .select()
+                    .single();
+
                 if (staffError) throw staffError;
 
+                console.log('Staff balance after update:', updatedStaff);
+
                 // 2. Add amount to Admin balance
-                const { data: adminProfile } = await supabase
+                const { data: adminProfile, error: fetchAdminError } = await supabase
                     .from('profiles')
                     .select('balance')
                     .eq('id', currentUser.id)
                     .single();
 
-                const newAdminBalance = (adminProfile?.balance || 0) + amount;
+                if (fetchAdminError) throw fetchAdminError;
 
-                const { error: adminError } = await supabase
+                const newAdminBalance = (adminProfile?.balance || 0) + staffAmount;
+
+                const { data: updatedAdmin, error: adminError } = await supabase
                     .from('profiles')
                     .update({ balance: newAdminBalance })
-                    .eq('id', currentUser.id);
+                    .eq('id', currentUser.id)
+                    .select()
+                    .single();
+
                 if (adminError) throw adminError;
 
-                alert(`เก็บเงิน ฿${amount.toLocaleString()} จาก ${user.full_name} สำเร็จ!`);
+                console.log('Admin balance after update:', updatedAdmin);
+
+                alert(`เก็บเงิน ฿${staffAmount.toLocaleString()} จาก ${user.full_name} สำเร็จ!`);
             } else {
                 // Shop: Just pay out (deduct from Admin balance, reset Shop balance)
                 const { data: adminProfile } = await supabase
