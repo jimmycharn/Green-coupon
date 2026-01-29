@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { createClient } from '@supabase/supabase-js';
 import RealtimeStatus from '../components/RealtimeStatus';
-import { Users, Store, DollarSign, History, UserCheck, AlertCircle, Edit, Save, X, Plus, Wallet, Coins } from 'lucide-react';
+import VibrationToggle, { canVibrate } from '../components/VibrationToggle';
+import { Users, Store, DollarSign, History, UserCheck, AlertCircle, Edit, Save, X, Plus, Wallet, Coins, RefreshCw } from 'lucide-react';
 
 // Create a separate client for creating users to avoid signing out the admin
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -61,7 +62,7 @@ export default function AdminDashboard() {
                 (payload) => {
                     console.log('Admin dashboard update received:', payload);
                     fetchData();
-                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    if (canVibrate()) navigator.vibrate([100, 50, 100]);
                 }
             )
             .subscribe((status) => {
@@ -242,6 +243,19 @@ export default function AdminDashboard() {
             {/* Admin Balance Card */}
             <div className="bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
+
+                {/* Vibration Toggle & Refresh */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                    <VibrationToggle />
+                    <button
+                        onClick={fetchData}
+                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                        title="รีเฟรช"
+                    >
+                        <RefreshCw className="w-5 h-5" />
+                    </button>
+                </div>
+
                 <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-1">
                         <Coins className="w-5 h-5 text-red-200" />

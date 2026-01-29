@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Scan, History, X, CreditCard, User, Bell, RefreshCw } from 'lucide-react';
 import QRScanner from '../components/QRScanner';
 import RealtimeStatus from '../components/RealtimeStatus';
+import VibrationToggle, { canVibrate } from '../components/VibrationToggle';
 
 export default function StudentDashboard() {
     const [profile, setProfile] = useState(null);
@@ -19,7 +20,7 @@ export default function StudentDashboard() {
     // Show notification
     const showNotification = (message, type = 'success') => {
         setNotification({ message, type });
-        if (navigator.vibrate) {
+        if (canVibrate()) {
             navigator.vibrate(200);
         }
         setTimeout(() => setNotification(null), 3000);
@@ -172,6 +173,8 @@ export default function StudentDashboard() {
     return (
         <div className="space-y-6">
             <RealtimeStatus status={realtimeStatus} />
+
+            <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดนักเรียน</h1>
             {/* Notification Toast */}
             {notification && (
                 <div className={`fixed top-4 left-4 right-4 z-50 p-4 rounded-xl shadow-lg flex items-center gap-3 animate-pulse ${notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
@@ -187,7 +190,8 @@ export default function StudentDashboard() {
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-10 -mb-10"></div>
 
                 {/* Refresh Button */}
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-4 right-4 flex gap-2">
+                    <VibrationToggle />
                     <button
                         onClick={handleRefresh}
                         className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"

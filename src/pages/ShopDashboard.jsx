@@ -67,19 +67,21 @@ export default function ShopDashboard() {
     }, []);
 
     useEffect(() => {
-        let userId = null;
         let channel = null;
+        let mounted = true;
 
         const init = async () => {
-            userId = await fetchProfile();
-            if (userId) {
+            const userId = await fetchProfile();
+            if (mounted && userId) {
                 await fetchTransactions(userId);
                 setLoading(false);
 
                 // Realtime Subscription
-                console.log('Setting up Realtime subscription for Shop:', userId);
+                const channelName = `shop_dashboard_${userId}_${Date.now()}`;
+                console.log('Setting up Realtime subscription for Shop:', channelName);
+
                 channel = supabase
-                    .channel(`shop_${userId}`)
+                    .channel(channelName)
                     .on(
                         'postgres_changes',
                         {
@@ -110,7 +112,9 @@ export default function ShopDashboard() {
                     )
                     .subscribe((status) => {
                         console.log('Realtime subscription status:', status);
-                        setRealtimeStatus(status);
+                        if (mounted) {
+                            setRealtimeStatus(status);
+                        }
                     });
             }
         };
@@ -118,6 +122,7 @@ export default function ShopDashboard() {
         init();
 
         return () => {
+            mounted = false;
             if (channel) supabase.removeChannel(channel);
         };
     }, []);
@@ -146,6 +151,8 @@ export default function ShopDashboard() {
     return (
         <div className="space-y-6">
             <RealtimeStatus status={realtimeStatus} />
+
+            <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดร้านค้า</h1>
             {/* Payment Notification */}
             {notification && (
                 <div className="fixed top-4 left-4 right-4 z-50 bg-green-500 text-white p-4 rounded-xl shadow-2xl animate-bounce">
@@ -170,12 +177,29 @@ export default function ShopDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-xl shadow-lg text-white relative">
                     {/* Refresh Button */}
-                    <button
-                        onClick={handleRefresh}
-                        className="absolute top-4 right-4 p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
-                    >
-                        <RefreshCw className="w-5 h-5" />
-                    </button>
+                    <div className="absolute top-4 right-4 flex gap-2">
+                        <button
+                            onClick={() => {
+                                if (navigator.vibrate) {
+                                    const result = navigator.vibrate([200, 100, 200]);
+                                    alert(`Vibration triggered: ${result}`);
+                                } else {
+                                    alert('Vibration not supported on this device');
+                                }
+                            }}
+                            className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                            title="ทดสอบสั่น"
+                        >
+                            <Bell className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={handleRefresh}
+                            className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                            title="รีเฟรช"
+                        >
+                            <RefreshCw className="w-5 h-5" />
+                        </button>
+                    </div>
 
                     <div className="flex items-center gap-3 mb-2">
                         <div className="bg-white bg-opacity-20 p-2 rounded-lg">

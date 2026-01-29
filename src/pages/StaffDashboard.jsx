@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import QRScanner from '../components/QRScanner';
 import RealtimeStatus from '../components/RealtimeStatus';
-import { PlusCircle, MinusCircle, UserCheck, CheckCircle, History, CreditCard, Search, Users, Wallet } from 'lucide-react';
+import VibrationToggle, { canVibrate } from '../components/VibrationToggle';
+import { PlusCircle, MinusCircle, UserCheck, CheckCircle, History, CreditCard, Search, Users, Wallet, RefreshCw } from 'lucide-react';
 
 export default function StaffDashboard() {
     const [mode, setMode] = useState(null); // 'topup' or 'refund'
@@ -79,7 +80,7 @@ export default function StaffDashboard() {
                     (payload) => {
                         console.log('Realtime update:', payload);
                         setStaffBalance(payload.new.balance);
-                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                        if (canVibrate()) navigator.vibrate([200, 100, 200]);
                     }
                 )
                 .subscribe((status) => {
@@ -165,7 +166,7 @@ export default function StaffDashboard() {
             });
 
             // Vibrate
-            if (navigator.vibrate) {
+            if (canVibrate()) {
                 navigator.vibrate([100, 50, 100]);
             }
 
@@ -208,6 +209,19 @@ export default function StaffDashboard() {
             {/* Cash on Hand Card */}
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
+
+                {/* Refresh & Vibration */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                    <VibrationToggle />
+                    <button
+                        onClick={fetchStaffProfile}
+                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                        title="รีเฟรช"
+                    >
+                        <RefreshCw className="w-5 h-5" />
+                    </button>
+                </div>
+
                 <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-1">
                         <Wallet className="w-5 h-5 text-purple-200" />
