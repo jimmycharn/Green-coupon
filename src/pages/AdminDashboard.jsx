@@ -171,96 +171,24 @@ export default function AdminDashboard() {
         }
 
         try {
-            // Get current admin ID
-            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            const actionType = user.role === 'staff' ? 'collect_from_staff' : 'pay_shop';
 
-            if (user.role === 'staff') {
-                // Staff: Collect cash and add to Admin balance
-                // Get current staff balance first to ensure we have the correct amount
-                const { data: staffProfile, error: fetchStaffError } = await supabase
-                    .from('profiles')
-                    .select('balance')
-                    .eq('id', user.id)
-                    .single();
+            const { data: result, error } = await supabase.rpc('admin_handle_cash', {
+                target_user_id: user.id,
+                action_type: actionType
+            });
 
-                if (fetchStaffError) throw fetchStaffError;
+            if (error) throw error;
 
-                const staffAmount = staffProfile?.balance || 0;
-                if (staffAmount <= 0) {
-                    alert('ไม่มียอดเงินที่ Staff');
-                    return;
-                }
-
-                // 1. Reset Staff balance to 0
-                const { data: updatedStaff, error: staffError } = await supabase
-                    .from('profiles')
-                    .update({ balance: 0 })
-                    .eq('id', user.id)
-                    .select()
-                    .single();
-
-                if (staffError) throw staffError;
-
-                console.log('Staff balance after update:', updatedStaff);
-
-                // 2. Add amount to Admin balance
-                const { data: adminProfile, error: fetchAdminError } = await supabase
-                    .from('profiles')
-                    .select('balance')
-                    .eq('id', currentUser.id)
-                    .single();
-
-                if (fetchAdminError) throw fetchAdminError;
-
-                const newAdminBalance = (adminProfile?.balance || 0) + staffAmount;
-
-                const { data: updatedAdmin, error: adminError } = await supabase
-                    .from('profiles')
-                    .update({ balance: newAdminBalance })
-                    .eq('id', currentUser.id)
-                    .select()
-                    .single();
-
-                if (adminError) throw adminError;
-
-                console.log('Admin balance after update:', updatedAdmin);
-
-                alert(`เก็บเงิน ฿${staffAmount.toLocaleString()} จาก ${user.full_name} สำเร็จ!`);
-            } else {
-                // Shop: Just pay out (deduct from Admin balance, reset Shop balance)
-                const { data: adminProfile } = await supabase
-                    .from('profiles')
-                    .select('balance')
-                    .eq('id', currentUser.id)
-                    .single();
-
-                const currentAdminBalance = adminProfile?.balance || 0;
-
-                if (currentAdminBalance < amount) {
-                    alert(`เงินสด Admin ไม่พอ! มีเพียง ฿${currentAdminBalance.toLocaleString()}`);
-                    return;
-                }
-
-                // 1. Deduct from Admin balance
-                const { error: adminError } = await supabase
-                    .from('profiles')
-                    .update({ balance: currentAdminBalance - amount })
-                    .eq('id', currentUser.id);
-                if (adminError) throw adminError;
-
-                // 2. Reset Shop balance to 0
-                const { error: shopError } = await supabase
-                    .from('profiles')
-                    .update({ balance: 0 })
-                    .eq('id', user.id);
-                if (shopError) throw shopError;
-
-                alert(`จ่ายเงิน ฿${amount.toLocaleString()} ให้ ${user.full_name} สำเร็จ!`);
+            if (!result.success) {
+                throw new Error(result.message);
             }
 
+            alert(result.message);
             fetchData();
         } catch (error) {
-            alert('เกิดข้อผิดพลาด: ' + error.message);
+            console.error('Error handling cash:', error);
+            alert('เกิดข้อผิดพลาด: ' + (error.message || error.error_description || 'Unknown error'));
         }
     };
 
