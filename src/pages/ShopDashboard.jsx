@@ -66,7 +66,7 @@ export default function ShopDashboard() {
 
     useEffect(() => {
         let userId = null;
-        let pollingInterval = null;
+        let channel = null;
 
         const init = async () => {
             userId = await fetchProfile();
@@ -74,18 +74,46 @@ export default function ShopDashboard() {
                 await fetchTransactions(userId);
                 setLoading(false);
 
-                // Poll for updates every 2 seconds
-                pollingInterval = setInterval(() => {
-                    fetchProfile();
-                    fetchTransactions(userId, true);
-                }, 2000);
+                // Realtime Subscription
+                console.log('Setting up Realtime subscription for Shop:', userId);
+                channel = supabase
+                    .channel(`shop_${userId}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'profiles',
+                            filter: `id=eq.${userId}`
+                        },
+                        (payload) => {
+                            console.log('Profile update received:', payload);
+                            setProfile(payload.new);
+                        }
+                    )
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'INSERT',
+                            schema: 'public',
+                            table: 'transactions',
+                            filter: `receiver_id=eq.${userId}`
+                        },
+                        (payload) => {
+                            console.log('New transaction received:', payload);
+                            fetchTransactions(userId, true);
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('Realtime subscription status:', status);
+                    });
             }
         };
 
         init();
 
         return () => {
-            if (pollingInterval) clearInterval(pollingInterval);
+            if (channel) supabase.removeChannel(channel);
         };
     }, []);
 

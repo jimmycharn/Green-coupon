@@ -44,6 +44,30 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         fetchData();
+
+        // Realtime subscription for all profile updates
+        console.log('Setting up Realtime subscription for Admin');
+        const subscription = supabase
+            .channel('admin_dashboard_updates')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'profiles'
+                },
+                (payload) => {
+                    console.log('Admin dashboard update received:', payload);
+                    fetchData();
+                }
+            )
+            .subscribe((status) => {
+                console.log('Admin Realtime status:', status);
+            });
+
+        return () => {
+            supabase.removeChannel(subscription);
+        };
     }, []);
 
     const fetchData = async () => {

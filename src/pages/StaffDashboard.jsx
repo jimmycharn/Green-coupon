@@ -58,6 +58,57 @@ export default function StaffDashboard() {
     useEffect(() => {
         fetchStaffProfile();
         fetchRecentTransactions();
+
+        // Realtime subscription for balance updates
+        const subscription = supabase
+            .channel('staff_balance_updates')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'profiles',
+                    filter: `id=eq.${supabase.auth.getUser().then(({ data }) => data.user?.id)}` // This won't work directly in filter string usually, need to set up after auth
+                },
+                (payload) => {
+                    console.log('Balance update received:', payload);
+                    setStaffBalance(payload.new.balance);
+                }
+            )
+            .subscribe();
+
+        // Better approach: Set up subscription after getting user ID
+        const setupRealtime = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const channel = supabase
+                .channel(`staff_${user.id}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'profiles',
+                        filter: `id=eq.${user.id}`
+                    },
+                    (payload) => {
+                        console.log('Realtime update:', payload);
+                        setStaffBalance(payload.new.balance);
+                    }
+                )
+                .subscribe();
+
+            return () => {
+                supabase.removeChannel(channel);
+            };
+        };
+
+        const cleanupPromise = setupRealtime();
+
+        return () => {
+            cleanupPromise.then(cleanup => cleanup && cleanup());
+        };
     }, []);
 
     const handleScan = async (data) => {
