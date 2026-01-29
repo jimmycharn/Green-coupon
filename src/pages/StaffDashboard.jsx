@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import QRScanner from '../components/QRScanner';
-import { PlusCircle, MinusCircle, UserCheck, CheckCircle, History, CreditCard, Search, Users } from 'lucide-react';
+import { PlusCircle, MinusCircle, UserCheck, CheckCircle, History, CreditCard, Search, Users, Wallet } from 'lucide-react';
 
 export default function StaffDashboard() {
     const [mode, setMode] = useState(null); // 'topup' or 'refund'
@@ -15,6 +15,20 @@ export default function StaffDashboard() {
     const [recentTransactions, setRecentTransactions] = useState([]);
     const [students, setStudents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [staffBalance, setStaffBalance] = useState(0); // Cash on Hand
+
+    // Fetch staff profile (for Cash on Hand)
+    const fetchStaffProfile = useCallback(async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { data } = await supabase
+                .from('profiles')
+                .select('balance')
+                .eq('id', user.id)
+                .single();
+            setStaffBalance(data?.balance || 0);
+        }
+    }, []);
 
     // Fetch recent transactions by this staff
     const fetchRecentTransactions = useCallback(async () => {
@@ -42,6 +56,7 @@ export default function StaffDashboard() {
     };
 
     useEffect(() => {
+        fetchStaffProfile();
         fetchRecentTransactions();
     }, []);
 
@@ -116,6 +131,7 @@ export default function StaffDashboard() {
             }
 
             fetchRecentTransactions();
+            fetchStaffProfile(); // Update Cash on Hand
 
             // Reset after 3 seconds
             setTimeout(() => {
@@ -147,6 +163,20 @@ export default function StaffDashboard() {
             <div className="text-center">
                 <h1 className="text-2xl font-bold text-gray-800">จุดขายคูปอง</h1>
                 <p className="text-gray-500">เลือกการดำเนินการ</p>
+            </div>
+
+            {/* Cash on Hand Card */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
+                <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-1">
+                        <Wallet className="w-5 h-5 text-purple-200" />
+                        <p className="text-purple-100 text-sm">เงินสดในมือ (Cash on Hand)</p>
+                    </div>
+                    <h2 className="text-4xl font-bold">
+                        ฿{Number(staffBalance || 0).toLocaleString()}
+                    </h2>
+                </div>
             </div>
 
             {/* Success Screen */}
@@ -376,8 +406,8 @@ export default function StaffDashboard() {
                                         type="button"
                                         onClick={() => setAmount(amt.toString())}
                                         className={`py-3 rounded-lg font-medium transition-colors ${amount === amt.toString()
-                                                ? mode === 'topup' ? 'bg-green-600 text-white' : 'bg-orange-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? mode === 'topup' ? 'bg-green-600 text-white' : 'bg-orange-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
                                         ฿{amt}
@@ -402,8 +432,8 @@ export default function StaffDashboard() {
                                 type="submit"
                                 disabled={loading || !amount}
                                 className={`w-full py-4 rounded-xl font-bold text-white text-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${mode === 'topup'
-                                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
-                                        : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
+                                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
                                     }`}
                             >
                                 {loading ? 'กำลังดำเนินการ...' : 'ยืนยัน'}
