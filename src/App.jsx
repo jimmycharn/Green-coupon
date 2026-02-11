@@ -4,6 +4,8 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import UpdatePassword from './pages/UpdatePassword';
 import StudentDashboard from './pages/StudentDashboard';
 import ShopDashboard from './pages/ShopDashboard';
 import StaffDashboard from './pages/StaffDashboard';
@@ -15,6 +17,8 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/update-password" element={<UpdatePassword />} />
 
                 <Route element={<ProtectedRoute />}>
                     <Route element={<Layout />}>

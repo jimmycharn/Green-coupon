@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { createClient } from '@supabase/supabase-js';
+import { Link } from 'react-router-dom';
 import RealtimeStatus from '../components/RealtimeStatus';
 import VibrationToggle, { canVibrate } from '../components/VibrationToggle';
 import { Users, Store, DollarSign, History, UserCheck, AlertCircle, Edit, Save, X, Plus, Wallet, Coins, RefreshCw } from 'lucide-react';
@@ -45,6 +46,14 @@ export default function AdminDashboard() {
     });
     const [createLoading, setCreateLoading] = useState(false);
 
+    // Change Password State
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+
     useEffect(() => {
         fetchData();
 
@@ -82,6 +91,7 @@ export default function AdminDashboard() {
             const { data: { user } } = await supabase.auth.getUser();
             let currentAdminBalance = 0;
             if (user) {
+                setCurrentUser(user);
                 const { data: adminProfile } = await supabase
                     .from('profiles')
                     .select('balance')
@@ -184,6 +194,55 @@ export default function AdminDashboard() {
         } catch (error) {
             alert('เกิดข้อผิดพลาด: ' + error.message);
         }
+    }
+
+
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+
+        if (!currentUser?.email) {
+            alert('ไม่พบข้อมูลผู้ใช้ กรุณารีเฟรชหน้าจอ');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert('รหัสผ่านใหม่ไม่ตรงกัน');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+            return;
+        }
+
+        setPasswordLoading(true);
+
+        try {
+            // 1. Verify old password by attempting to sign in
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: currentUser.email,
+                password: oldPassword,
+            });
+
+            if (signInError) {
+                throw new Error('รหัสผ่านเดิมไม่ถูกต้อง');
+            }
+
+            // 2. Update to new password
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+            if (error) throw error;
+
+            alert('เปลี่ยนรหัสผ่านสำเร็จ');
+            setShowPasswordModal(false);
+            setNewPassword('');
+            setConfirmPassword('');
+            setOldPassword('');
+        } catch (error) {
+            alert('เกิดข้อผิดพลาด: ' + error.message);
+        } finally {
+            setPasswordLoading(false);
+        }
     };
 
     const handleCashAction = async (user) => {
@@ -238,7 +297,17 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-8">
             <RealtimeStatus status={realtimeStatus} />
-            <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดผู้ดูแลระบบ</h1>
+
+
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดผู้ดูแลระบบ</h1>
+                <button
+                    onClick={() => setShowPasswordModal(true)}
+                    className="text-sm text-green-600 hover:text-green-700 underline"
+                >
+                    เปลี่ยนรหัสผ่าน
+                </button>
+            </div>
 
             {/* Admin Balance Card */}
             <div className="bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
@@ -536,6 +605,90 @@ export default function AdminDashboard() {
                                 {createLoading ? 'กำลังสร้าง...' : 'สร้างผู้ใช้งาน'}
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Change Password Modal */}
+            {showPasswordModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="bg-white rounded-2xl p-8 w-full max-w-sm relative shadow-2xl transform transition-all scale-100">
+                        <button
+                            onClick={() => setShowPasswordModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="text-center mb-6">
+                            <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Edit className="w-6 h-6 text-green-600" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800">เปลี่ยนรหัสผ่าน</h3>
+                            <p className="text-gray-500 text-sm mt-1">กำหนดรหัสผ่านใหม่สำหรับการเข้าใช้งาน</p>
+                        </div>
+
+                        <form onSubmit={handleChangePassword} className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">รหัสผ่านเดิม</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="กรอกรหัสผ่านปัจจุบัน"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">รหัสผ่านใหม่</label>
+                                <input
+                                    type="password"
+                                    required
+                                    minLength={6}
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="อย่างน้อย 6 ตัวอักษร"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">ยืนยันรหัสผ่านใหม่</label>
+                                <input
+                                    type="password"
+                                    required
+                                    minLength={6}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="กรอกอีกครั้ง"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={passwordLoading}
+                                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {passwordLoading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                                        กำลังบันทึก...
+                                    </span>
+                                ) : (
+                                    'บันทึกการเปลี่ยนแปลง'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="mt-4 text-center">
+                            <Link
+                                to="/forgot-password"
+                                className="text-sm text-green-600 hover:text-green-700 font-medium hover:underline"
+                                onClick={() => setShowPasswordModal(false)}
+                            >
+                                ลืมรหัสผ่าน?
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}

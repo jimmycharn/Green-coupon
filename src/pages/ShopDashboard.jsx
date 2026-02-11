@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
 import RealtimeStatus from '../components/RealtimeStatus';
-import { History, DollarSign, Bell, X, RefreshCw } from 'lucide-react';
+import { History, DollarSign, Bell, X, RefreshCw, Lock } from 'lucide-react';
 
 export default function ShopDashboard() {
     const [profile, setProfile] = useState(null);
@@ -11,6 +11,9 @@ export default function ShopDashboard() {
     const [showQRModal, setShowQRModal] = useState(false);
     const [notification, setNotification] = useState(null);
     const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const previousBalanceRef = useRef(null);
     const previousTxCountRef = useRef(0);
 
@@ -127,6 +130,35 @@ export default function ShopDashboard() {
         };
     }, []);
 
+
+
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            alert('รหัสผ่านไม่ตรงกัน');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            if (error) throw error;
+
+            alert('เปลี่ยนรหัสผ่านสำเร็จ');
+            setShowPasswordModal(false);
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (error) {
+            alert('เกิดข้อผิดพลาด: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleRefresh = async () => {
         await fetchProfile();
         if (profile?.id) {
@@ -153,6 +185,16 @@ export default function ShopDashboard() {
             <RealtimeStatus status={realtimeStatus} />
 
             <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดร้านค้า</h1>
+
+            <div className="flex justify-end">
+                <button
+                    onClick={() => setShowPasswordModal(true)}
+                    className="text-sm text-green-600 hover:text-green-700 underline"
+                >
+                    เปลี่ยนรหัสผ่าน
+                </button>
+            </div>
+
             {/* Payment Notification */}
             {notification && (
                 <div className="fixed top-4 left-4 right-4 z-50 bg-green-500 text-white p-4 rounded-xl shadow-2xl animate-bounce">
@@ -293,6 +335,90 @@ export default function ShopDashboard() {
                                 <p className="text-gray-600 text-sm">ร้านค้า</p>
                                 <p className="font-bold text-xl text-gray-800">{profile?.full_name || 'ไม่ระบุชื่อ'}</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reset Password Modal */}
+            {showPasswordModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="bg-white rounded-2xl p-8 w-full max-w-sm relative shadow-2xl transform transition-all scale-100">
+                        <button
+                            onClick={() => setShowPasswordModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="text-center mb-6">
+                            <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Lock className="w-6 h-6 text-green-600" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800">เปลี่ยนรหัสผ่าน</h3>
+                            <p className="text-gray-500 text-sm mt-1">กำหนดรหัสผ่านใหม่สำหรับการเข้าใช้งาน</p>
+                        </div>
+
+                        <form onSubmit={handleChangePassword} className="space-y-5">
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">รหัสผ่านเดิม</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="กรอกรหัสผ่านปัจจุบัน"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">รหัสผ่านใหม่</label>
+                                <input
+                                    type="password"
+                                    required
+                                    minLength={6}
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="อย่างน้อย 6 ตัวอักษร"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">ยืนยันรหัสผ่านใหม่</label>
+                                <input
+                                    type="password"
+                                    required
+                                    minLength={6}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all bg-gray-50 hover:bg-white"
+                                    placeholder="กรอกอีกครั้ง"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                                        กำลังบันทึก...
+                                    </span>
+                                ) : (
+                                    'บันทึกการเปลี่ยนแปลง'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="mt-4 text-center">
+                            <Link
+                                to="/forgot-password"
+                                className="text-sm text-green-600 hover:text-green-700 font-medium hover:underline"
+                                onClick={() => setShowPasswordModal(false)}
+                            >
+                                ลืมรหัสผ่าน?
+                            </Link>
                         </div>
                     </div>
                 </div>

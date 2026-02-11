@@ -100,6 +100,12 @@ export default function Login() {
                     >
                         {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
                     </button>
+
+                    <div className="flex justify-center mt-4">
+                        <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700 font-medium">
+                            ลืมรหัสผ่าน?
+                        </Link>
+                    </div>
                 </form>
 
                 <p className="text-center text-gray-500 mt-6">
