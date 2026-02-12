@@ -16,6 +16,7 @@ export default function StudentDashboard() {
     const [notification, setNotification] = useState(null);
     const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const previousBalanceRef = useRef(null);
@@ -168,11 +169,24 @@ export default function StudentDashboard() {
 
         try {
             setLoading(true);
+
+            // 1. Verify old password
+            const { data: { user } } = await supabase.auth.getUser();
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: oldPassword,
+            });
+            if (signInError) {
+                throw new Error('รหัสผ่านเดิมไม่ถูกต้อง');
+            }
+
+            // 2. Update to new password
             const { error } = await supabase.auth.updateUser({ password: newPassword });
             if (error) throw error;
 
             alert('เปลี่ยนรหัสผ่านสำเร็จ');
             setShowPasswordModal(false);
+            setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
         } catch (error) {
