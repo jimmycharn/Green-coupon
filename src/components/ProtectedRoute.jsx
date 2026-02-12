@@ -8,25 +8,37 @@ export default function ProtectedRoute({ allowedRoles }) {
     const [role, setRole] = useState(null);
 
     useEffect(() => {
+        let cancelled = false;
+
         const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (cancelled) return;
+                if (!user) {
+                    setLoading(false);
+                    return;
+                }
+
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+
+                if (cancelled) return;
+                setUser(user);
+                setRole(profile?.role);
                 setLoading(false);
-                return;
+            } catch (err) {
+                if (cancelled) return;
+                console.error('ProtectedRoute error:', err);
+                setLoading(false);
             }
-
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', user.id)
-                .single();
-
-            setUser(user);
-            setRole(profile?.role);
-            setLoading(false);
         };
 
         checkUser();
+
+        return () => { cancelled = true; };
     }, []);
 
     if (loading) {

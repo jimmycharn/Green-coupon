@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import RealtimeStatus from '../components/RealtimeStatus';
+import VibrationToggle from '../components/VibrationToggle';
 import { History, DollarSign, Bell, X, RefreshCw, Lock } from 'lucide-react';
 
 export default function ShopDashboard() {
@@ -18,6 +19,7 @@ export default function ShopDashboard() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const previousBalanceRef = useRef(null);
     const previousTxCountRef = useRef(0);
+    const [refreshing, setRefreshing] = useState(false);
 
     // Show notification
     const showNotification = async (amount, senderName) => {
@@ -175,10 +177,12 @@ export default function ShopDashboard() {
     };
 
     const handleRefresh = async () => {
+        setRefreshing(true);
         await fetchProfile();
         if (profile?.id) {
             await fetchTransactions(profile.id, true);
         }
+        setRefreshing(false);
     };
 
     if (loading) {
@@ -234,27 +238,15 @@ export default function ShopDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-xl shadow-lg text-white relative">
                     {/* Refresh Button */}
-                    <div className="absolute top-4 right-4 flex gap-2">
-                        <button
-                            onClick={() => {
-                                if (navigator.vibrate) {
-                                    const result = navigator.vibrate([200, 100, 200]);
-                                    alert(`Vibration triggered: ${result}`);
-                                } else {
-                                    alert('Vibration not supported on this device');
-                                }
-                            }}
-                            className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
-                            title="ทดสอบสั่น"
-                        >
-                            <Bell className="w-5 h-5" />
-                        </button>
+                    <div className="absolute top-4 right-4 flex gap-2 z-20">
+                        <VibrationToggle role="shop" />
                         <button
                             onClick={handleRefresh}
-                            className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                            disabled={refreshing}
+                            className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors disabled:opacity-50"
                             title="รีเฟรช"
                         >
-                            <RefreshCw className="w-5 h-5" />
+                            <RefreshCw className={`w-5 h-5 transition-transform ${refreshing ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
 

@@ -39,6 +39,8 @@ export default function Login() {
             else navigate('/');
 
         } catch (err) {
+            // Ignore AbortError caused by React StrictMode or slow connections
+            if (err.name === 'AbortError') return;
             setError(err.message);
         } finally {
             setLoading(false);

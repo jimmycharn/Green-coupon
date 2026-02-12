@@ -53,6 +53,7 @@ export default function AdminDashboard() {
     const [oldPassword, setOldPassword] = useState('');
     const [passwordLoading, setPasswordLoading] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -71,7 +72,7 @@ export default function AdminDashboard() {
                 (payload) => {
                     console.log('Admin dashboard update received:', payload);
                     fetchData();
-                    if (canVibrate()) navigator.vibrate([100, 50, 100]);
+                    if (canVibrate('admin')) navigator.vibrate([100, 50, 100]);
                 }
             )
             .subscribe((status) => {
@@ -314,14 +315,19 @@ export default function AdminDashboard() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
 
                 {/* Vibration Toggle & Refresh */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                    <VibrationToggle />
+                <div className="absolute top-4 right-4 flex gap-2 z-20">
+                    <VibrationToggle role="admin" />
                     <button
-                        onClick={fetchData}
-                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                        onClick={async () => {
+                            setRefreshing(true);
+                            await fetchData();
+                            setRefreshing(false);
+                        }}
+                        disabled={refreshing}
+                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors disabled:opacity-50"
                         title="รีเฟรช"
                     >
-                        <RefreshCw className="w-5 h-5" />
+                        <RefreshCw className={`w-5 h-5 transition-transform ${refreshing ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
 

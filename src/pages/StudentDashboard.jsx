@@ -21,11 +21,12 @@ export default function StudentDashboard() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const previousBalanceRef = useRef(null);
     const userIdRef = useRef(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     // Show notification
     const showNotification = (message, type = 'success') => {
         setNotification({ message, type });
-        if (canVibrate()) {
+        if (canVibrate('student')) {
             navigator.vibrate(200);
         }
         setTimeout(() => setNotification(null), 3000);
@@ -197,9 +198,11 @@ export default function StudentDashboard() {
     };
 
     const handleRefresh = async () => {
+        setRefreshing(true);
         await fetchProfile();
         await fetchTransactions();
         showNotification('รีเฟรชสำเร็จ', 'info');
+        setRefreshing(false);
     };
 
     if (loading) {
@@ -247,14 +250,15 @@ export default function StudentDashboard() {
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-10 -mb-10"></div>
 
                 {/* Refresh Button */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                    <VibrationToggle />
+                <div className="absolute top-4 right-4 flex gap-2 z-20">
+                    <VibrationToggle role="student" />
                     <button
                         onClick={handleRefresh}
-                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                        disabled={refreshing}
+                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors disabled:opacity-50"
                         title="รีเฟรช"
                     >
-                        <RefreshCw className="w-4 h-4" />
+                        <RefreshCw className={`w-4 h-4 transition-transform ${refreshing ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
 

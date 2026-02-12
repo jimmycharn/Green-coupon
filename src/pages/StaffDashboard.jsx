@@ -19,6 +19,7 @@ export default function StaffDashboard() {
     const [searchTerm, setSearchTerm] = useState('');
     const [staffBalance, setStaffBalance] = useState(0); // Cash on Hand
     const [realtimeStatus, setRealtimeStatus] = useState('CONNECTING');
+    const [refreshing, setRefreshing] = useState(false);
 
 
 
@@ -82,7 +83,7 @@ export default function StaffDashboard() {
                     (payload) => {
                         console.log('Realtime update:', payload);
                         setStaffBalance(payload.new.balance);
-                        if (canVibrate()) navigator.vibrate([200, 100, 200]);
+                        if (canVibrate('staff')) navigator.vibrate([200, 100, 200]);
                     }
                 )
                 .subscribe((status) => {
@@ -171,7 +172,7 @@ export default function StaffDashboard() {
             });
 
             // Vibrate
-            if (canVibrate()) {
+            if (canVibrate('staff')) {
                 navigator.vibrate([100, 50, 100]);
             }
 
@@ -217,14 +218,20 @@ export default function StaffDashboard() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
 
                 {/* Refresh & Vibration */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                    <VibrationToggle />
+                <div className="absolute top-4 right-4 flex gap-2 z-20">
+                    <VibrationToggle role="staff" />
                     <button
-                        onClick={fetchStaffProfile}
-                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                        onClick={async () => {
+                            setRefreshing(true);
+                            await fetchStaffProfile();
+                            await fetchRecentTransactions();
+                            setRefreshing(false);
+                        }}
+                        disabled={refreshing}
+                        className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors disabled:opacity-50"
                         title="รีเฟรช"
                     >
-                        <RefreshCw className="w-5 h-5" />
+                        <RefreshCw className={`w-5 h-5 transition-transform ${refreshing ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
 
