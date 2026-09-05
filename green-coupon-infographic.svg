@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2200" viewBox="0 0 1600 2200" role="img" aria-labelledby="title desc">
+  <title id="title">Green Coupon — แอปทำงานอย่างไร</title>
+  <desc id="desc">อินโฟกราฟิกสถาปัตยกรรมและการไหลของข้อมูลของแอป Green Coupon ตั้งแต่ผู้ใช้ผ่านเว็บเบราว์เซอร์ไปยัง Supabase และบริการเว็บที่เกี่ยวข้อง</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f0fdf4"/>
+      <stop offset="0.55" stop-color="#ecfeff"/>
+      <stop offset="1" stop-color="#eef2ff"/>
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#047857"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="supabase" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#effdf5"/>
+      <stop offset="1" stop-color="#d1fae5"/>
+    </linearGradient>
+    <linearGradient id="client" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#064e3b" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.09"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#0f766e"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .thai { font-family: 'Noto Sans Thai', 'Leelawadee UI', Tahoma, Arial, sans-serif; fill: #0f172a; }
+      .title { font-size: 54px; font-weight: 800; letter-spacing: -1px; }
+      .subtitle { font-size: 25px; font-weight: 400; }
+      .section { font-size: 31px; font-weight: 800; }
+      .cardTitle { font-size: 25px; font-weight: 800; }
+      .body { font-size: 20px; font-weight: 500; }
+      .small { font-size: 17px; font-weight: 500; }
+      .tiny { font-size: 15px; font-weight: 500; }
+      .muted { fill: #475569; }
+      .white { fill: #ffffff; }
+      .green { fill: #047857; }
+      .blue { fill: #1d4ed8; }
+      .purple { fill: #6d28d9; }
+      .orange { fill: #c2410c; }
+      .line { stroke: #cbd5e1; stroke-width: 2; }
+      .dashed { stroke-dasharray: 9 8; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="2200" fill="url(#bg)"/>
+  <circle cx="1460" cy="120" r="240" fill="#bbf7d0" opacity="0.38"/>
+  <circle cx="80" cy="2050" r="260" fill="#bae6fd" opacity="0.32"/>
+
+  <rect x="70" y="65" width="1460" height="285" rx="38" fill="url(#hero)" filter="url(#shadow)"/>
+  <circle cx="195" cy="205" r="72" fill="#ffffff" opacity="0.18"/>
+  <rect x="160" y="165" width="70" height="82" rx="12" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <path d="M174 190h42M174 211h42M174 232h27" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M258 238c31-52 78-57 110-31-7 49-47 73-92 55-12-5-18-13-18-24z" fill="#bbf7d0"/>
+  <path d="M271 251c24-21 49-36 79-42" fill="none" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <text x="330" y="170" class="thai title white">GREEN COUPON</text>
+  <text x="330" y="214" class="thai subtitle white" opacity="0.93">แอปจัดการคูปองและกระเป๋าเงินดิจิทัลในโรงเรียน</text>
+  <text x="330" y="270" class="thai body white" opacity="0.9">ผู้ใช้หลายบทบาท  •  เติมเงิน  •  ชำระเงิน  •  คืนเงิน  •  ติดตามยอดแบบเรียลไทม์</text>
+  <rect x="1190" y="145" width="270" height="78" rx="39" fill="#ffffff" opacity="0.16"/>
+  <text x="1325" y="194" text-anchor="middle" class="thai body white">Web App / SPA</text>
+
+  <text x="90" y="425" class="thai section green">ภาพรวมการทำงาน</text>
+  <text x="90" y="462" class="thai body muted">ผู้ใช้เปิดแอปผ่านเว็บเบราว์เซอร์ → ระบบยืนยันตัวตน → ตรวจ role → ทำธุรกรรมกับฐานข้อมูลกลาง</text>
+
+  <rect x="90" y="500" width="430" height="440" rx="28" fill="url(#client)" stroke="#93c5fd" stroke-width="2" filter="url(#softShadow)"/>
+  <rect x="120" y="532" width="370" height="64" rx="18" fill="#2563eb"/>
+  <text x="305" y="574" text-anchor="middle" class="thai cardTitle white">1  เว็บเบราว์เซอร์</text>
+  <rect x="155" y="635" width="300" height="170" rx="16" fill="#ffffff" stroke="#bfdbfe" stroke-width="3"/>
+  <rect x="185" y="665" width="240" height="112" rx="8" fill="#dbeafe"/>
+  <path d="M206 747c36-50 66-15 93-44 28-29 49 8 82-25" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="222" cy="690" r="9" fill="#34d399"/><circle cx="251" cy="690" r="9" fill="#fbbf24"/><circle cx="280" cy="690" r="9" fill="#f87171"/>
+  <text x="305" y="858" text-anchor="middle" class="thai body blue">React + Vite</text>
+  <text x="305" y="893" text-anchor="middle" class="thai small muted">หน้าจอ Login, Dashboard และ QR</text>
+
+  <path d="M540 720 H670" fill="none" stroke="#0f766e" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="605" y="688" text-anchor="middle" class="thai small green">HTTPS / SDK</text>
+
+  <rect x="700" y="500" width="810" height="440" rx="28" fill="url(#supabase)" stroke="#6ee7b7" stroke-width="2" filter="url(#softShadow)"/>
+  <rect x="735" y="532" width="740" height="64" rx="18" fill="#059669"/>
+  <path d="M765 572l23-40 24 40h-47zM788 572h57l-29 48z" fill="#d1fae5"/>
+  <text x="1120" y="574" text-anchor="middle" class="thai cardTitle white">2  Supabase Cloud</text>
+  <rect x="750" y="635" width="220" height="230" rx="20" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+  <circle cx="860" cy="692" r="32" fill="#d1fae5"/>
+  <path d="M846 692h28M860 678v28" stroke="#059669" stroke-width="6" stroke-linecap="round"/>
+  <text x="860" y="758" text-anchor="middle" class="thai cardTitle green">Auth</text>
+  <text x="860" y="795" text-anchor="middle" class="thai small muted">สมัคร / Login</text>
+  <text x="860" y="823" text-anchor="middle" class="thai small muted">รีเซ็ตรหัสผ่าน</text>
+  <text x="860" y="851" text-anchor="middle" class="thai small muted">Session</text>
+
+  <rect x="995" y="635" width="220" height="230" rx="20" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+  <ellipse cx="1105" cy="704" rx="45" ry="15" fill="#bbf7d0" stroke="#059669" stroke-width="4"/>
+  <path d="M1060 704v54c0 9 20 17 45 17s45-8 45-17v-54M1060 731c0 9 20 17 45 17s45-8 45-17" fill="none" stroke="#059669" stroke-width="4"/>
+  <text x="1105" y="807" text-anchor="middle" class="thai cardTitle green">Postgres DB</text>
+  <text x="1105" y="838" text-anchor="middle" class="thai small muted">profiles</text>
+  <text x="1105" y="862" text-anchor="middle" class="thai small muted">transactions</text>
+
+  <rect x="1240" y="635" width="220" height="230" rx="20" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+  <path d="M1350 675v58M1315 707h70M1326 683l48 48M1374 683l-48 48" stroke="#059669" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="1350" cy="707" r="52" fill="none" stroke="#6ee7b7" stroke-width="4"/>
+  <text x="1350" y="807" text-anchor="middle" class="thai cardTitle green">Realtime</text>
+  <text x="1350" y="838" text-anchor="middle" class="thai small muted">ยอดเงิน / รายการ</text>
+  <text x="1350" y="862" text-anchor="middle" class="thai small muted">อัปเดตทันที</text>
+
+  <text x="90" y="1015" class="thai section green">ผู้ใช้งาน 4 บทบาท</text>
+  <text x="90" y="1050" class="thai body muted">ทุกบทบาทใช้บัญชีเดียวกัน แต่จะเห็น dashboard และสิทธิ์ตาม role ใน profile</text>
+
+  <rect x="90" y="1090" width="335" height="260" rx="24" fill="#ffffff" stroke="#86efac" stroke-width="3" filter="url(#softShadow)"/>
+  <circle cx="155" cy="1160" r="34" fill="#dcfce7"/><circle cx="155" cy="1150" r="12" fill="#16a34a"/><path d="M132 1193c8-22 38-22 46 0" fill="#16a34a"/>
+  <text x="215" y="1158" class="thai cardTitle green">นักเรียน</text>
+  <text x="125" y="1220" class="thai body">• รับเงินเติมจาก Staff</text>
+  <text x="125" y="1252" class="thai body">• สร้าง QR ให้ร้านสแกน</text>
+  <text x="125" y="1284" class="thai body">• จ่ายเงิน / ดูประวัติ</text>
+  <rect x="125" y="1300" width="110" height="28" rx="14" fill="#dcfce7"/><text x="180" y="1320" text-anchor="middle" class="thai tiny green">/student</text>
+
+  <rect x="445" y="1090" width="335" height="260" rx="24" fill="#ffffff" stroke="#fcd34d" stroke-width="3" filter="url(#softShadow)"/>
+  <circle cx="510" cy="1160" r="34" fill="#fef3c7"/><path d="M489 1160h42M510 1139v42" stroke="#d97706" stroke-width="8" stroke-linecap="round"/>
+  <text x="570" y="1158" class="thai cardTitle orange">Staff / จุดขาย</text>
+  <text x="480" y="1220" class="thai body">• สแกน QR นักเรียน</text>
+  <text x="480" y="1252" class="thai body">• เติมเงิน / คืนเงิน</text>
+  <text x="480" y="1284" class="thai body">• ดูเงินสดและรายการ</text>
+  <rect x="480" y="1300" width="95" height="28" rx="14" fill="#fef3c7"/><text x="527" y="1320" text-anchor="middle" class="thai tiny orange">/staff</text>
+
+  <rect x="800" y="1090" width="335" height="260" rx="24" fill="#ffffff" stroke="#c4b5fd" stroke-width="3" filter="url(#softShadow)"/>
+  <circle cx="865" cy="1160" r="34" fill="#ede9fe"/><path d="M844 1175h42v-32h-42zM851 1136h28" fill="none" stroke="#7c3aed" stroke-width="6" stroke-linecap="round"/>
+  <text x="925" y="1158" class="thai cardTitle purple">ร้านค้า</text>
+  <text x="835" y="1220" class="thai body">• แสดง QR ร้านค้า</text>
+  <text x="835" y="1252" class="thai body">• รับเงินจากนักเรียน</text>
+  <text x="835" y="1284" class="thai body">• แจ้งเตือนแบบทันที</text>
+  <rect x="835" y="1300" width="85" height="28" rx="14" fill="#ede9fe"/><text x="877" y="1320" text-anchor="middle" class="thai tiny purple">/shop</text>
+
+  <rect x="1155" y="1090" width="355" height="260" rx="24" fill="#ffffff" stroke="#fda4af" stroke-width="3" filter="url(#softShadow)"/>
+  <circle cx="1220" cy="1160" r="34" fill="#ffe4e6"/><path d="M1200 1168h40M1205 1155h30M1208 1142h24" stroke="#e11d48" stroke-width="6" stroke-linecap="round"/>
+  <text x="1280" y="1158" class="thai cardTitle" fill="#be123c">ผู้ดูแลระบบ</text>
+  <text x="1190" y="1220" class="thai body">• จัดการผู้ใช้และ role</text>
+  <text x="1190" y="1252" class="thai body">• จัดการเงินสดร้าน / Staff</text>
+  <text x="1190" y="1284" class="thai body">• ดูสถิติทั้งระบบ</text>
+  <rect x="1190" y="1300" width="85" height="28" rx="14" fill="#ffe4e6"/><text x="1232" y="1320" text-anchor="middle" class="thai tiny" fill="#be123c">/admin</text>
+
+  <text x="90" y="1435" class="thai section green">ธุรกรรมหลัก: เงินไหลอย่างไร</text>
+  <text x="90" y="1472" class="thai body muted">ทุกการโอนเรียกฟังก์ชันฐานข้อมูล transfer_funds เพื่อคำนวณยอดและบันทึก transactions</text>
+
+  <rect x="90" y="1510" width="1420" height="265" rx="28" fill="#ffffff" stroke="#99f6e4" stroke-width="2" filter="url(#softShadow)"/>
+  <rect x="130" y="1570" width="225" height="105" rx="20" fill="#fef3c7"/><text x="242" y="1615" text-anchor="middle" class="thai cardTitle orange">Staff</text><text x="242" y="1650" text-anchor="middle" class="thai body orange">เงินสด / จุดขาย</text>
+  <path d="M370 1622 H500" fill="none" stroke="#0f766e" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="435" y="1593" text-anchor="middle" class="thai small green">เติมเงิน</text>
+  <rect x="515" y="1570" width="225" height="105" rx="20" fill="#dcfce7"/><text x="627" y="1615" text-anchor="middle" class="thai cardTitle green">นักเรียน</text><text x="627" y="1650" text-anchor="middle" class="thai body green">ยอดคูปอง</text>
+  <path d="M755 1622 H885" fill="none" stroke="#0f766e" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="820" y="1593" text-anchor="middle" class="thai small green">ชำระเงิน</text>
+  <rect x="900" y="1570" width="225" height="105" rx="20" fill="#ede9fe"/><text x="1012" y="1615" text-anchor="middle" class="thai cardTitle purple">ร้านค้า</text><text x="1012" y="1650" text-anchor="middle" class="thai body purple">ยอดรับชำระ</text>
+  <path d="M1138 1622 H1268" fill="none" stroke="#0f766e" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="1203" y="1593" text-anchor="middle" class="thai small green">คืนเงิน</text>
+  <rect x="1283" y="1570" width="185" height="105" rx="20" fill="#e0f2fe"/><text x="1375" y="1615" text-anchor="middle" class="thai cardTitle blue">Staff</text><text x="1375" y="1650" text-anchor="middle" class="thai body blue">รับคืน / บันทึก</text>
+  <text x="800" y="1730" text-anchor="middle" class="thai small muted">ประเภทข้อมูลที่บันทึก: topup  •  payment  •  refund</text>
+
+  <text x="90" y="1860" class="thai section green">บริการเว็บและเทคโนโลยีที่เกี่ยวข้อง</text>
+  <rect x="90" y="1905" width="1420" height="190" rx="28" fill="#0f172a" filter="url(#shadow)"/>
+  <rect x="125" y="1940" width="245" height="115" rx="18" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="247" y="1980" text-anchor="middle" class="thai cardTitle white">Web Browser</text>
+  <text x="247" y="2018" text-anchor="middle" class="thai small" style="fill:#ffffff;font-weight:700">Camera • Vibration</text>
+  <text x="247" y="2045" text-anchor="middle" class="thai tiny" style="fill:#f8fafc;font-weight:600">QR Scanner / Web API</text>
+
+  <path d="M390 1998 H445" stroke="#60a5fa" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <rect x="465" y="1940" width="245" height="115" rx="18" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="587" y="1980" text-anchor="middle" class="thai cardTitle white">React + Vite</text>
+  <text x="587" y="2018" text-anchor="middle" class="thai small" style="fill:#ffffff;font-weight:700">SPA / Routing</text>
+  <text x="587" y="2045" text-anchor="middle" class="thai tiny" style="fill:#f8fafc;font-weight:600">ProtectedRoute + role</text>
+
+  <path d="M730 1998 H785" stroke="#60a5fa" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <rect x="805" y="1940" width="245" height="115" rx="18" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="927" y="1980" text-anchor="middle" class="thai cardTitle white">Supabase SDK</text>
+  <text x="927" y="2018" text-anchor="middle" class="thai small" style="fill:#bbf7d0;font-weight:700">Auth • Database</text>
+  <text x="927" y="2045" text-anchor="middle" class="thai tiny" style="fill:#f8fafc;font-weight:600">Realtime • RPC</text>
+
+  <path d="M1070 1998 H1125" stroke="#60a5fa" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <rect x="1145" y="1940" width="330" height="115" rx="18" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="1310" y="1980" text-anchor="middle" class="thai cardTitle white">Supabase Postgres</text>
+  <text x="1310" y="2018" text-anchor="middle" class="thai small" style="fill:#bbf7d0;font-weight:700">RLS • profiles • transactions</text>
+  <text x="1310" y="2045" text-anchor="middle" class="thai tiny" style="fill:#f8fafc;font-weight:600">Database Functions / Triggers</text>
+
+  <text x="90" y="2145" class="thai small muted">การนำขึ้นระบบ: Vercel (SPA rewrite → index.html)  •  ค่าตั้งต้นผ่าน VITE_SUPABASE_URL และ VITE_SUPABASE_ANON_KEY</text>
+  <text x="1510" y="2145" text-anchor="end" class="thai tiny muted">Green Coupon • System overview</text>
+</svg>
