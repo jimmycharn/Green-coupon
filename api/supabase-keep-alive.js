@@ -8,6 +8,12 @@ export default async function handler(req, res) {
     const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
     if (!cronSecret || !supabaseUrl || !supabaseAnonKey) {
+        const missing = [
+            !cronSecret && 'CRON_SECRET',
+            !supabaseUrl && 'SUPABASE_URL',
+            !supabaseAnonKey && 'SUPABASE_ANON_KEY',
+        ].filter(Boolean);
+        console.error('Cron environment is not configured. Missing:', missing.join(', '));
         return res.status(500).json({ error: 'Cron environment is not configured' });
     }
 
